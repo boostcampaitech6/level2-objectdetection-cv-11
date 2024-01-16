@@ -166,6 +166,7 @@ def main():
         if cfg.train_pipeline[2]['type'] == 'Resize':
             cfg.train_pipeline[2]['scale'] = (512,512)
         cfg.test_pipeline[1]['scale'] = (512,512)
+        cfg.visualizer.vis_backends = [dict(type='TensorboardVisBackend')] # tensorboard용
         cfg.default_hooks = dict(
             early_stopping=dict(
                 type="EarlyStoppingHook",
