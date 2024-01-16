@@ -82,7 +82,8 @@ def main():
     
     root='/data/ephemeral/home/data/dataset/'
     
-    # load config
+   
+    ## kfold 제대로 구현 안됨!! 코드 다시 확인 해야함 
     if args.kfold:
         cfg_list = os.listdir(args.kfold_config)
         cfg_list.sort()
