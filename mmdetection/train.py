@@ -123,7 +123,8 @@ def main():
                                     '"auto_scale_lr.enable" or '
                                     '"auto_scale_lr.base_batch_size" in your'
                                     ' configuration file.')
-
+            cfg.visualizer.vis_backends = [dict(type='TensorboardVisBackend')] # tensorboard용
+            
             # resume is determined in this priority: resume from > auto_resume
             if args.resume == 'auto':
                 cfg.resume = True
