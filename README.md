@@ -34,7 +34,7 @@ mim install mmdet
 
 # Train
 
-<a href="train.py"> train.py </a> 를 통해 실행
+<a href="mmdetection/train.py"> train.py </a> 를 통해 실행
 
 -- config : config 파일 경로, kfold 이용할 경우 입력 안함
 
