@@ -90,7 +90,8 @@ def main():
         for i, cfg_path in enumerate(cfg_list):
             cfg = Config.fromfile(os.path.join(args.kfold_config, cfg_path))
             cfg.train_cfg = dict(type='EpochBasedTrainLoop', max_epochs= args.epoch * (i+1), val_interval=1)
-            cfg.train_pipeline[2]['scale'] = (512,512)
+            if cfg.train_pipline[2]['type'] == 'Resize':
+                cfg.train_pipeline[2]['scale'] = (512,512)
             cfg.test_pipeline[1]['scale'] = (512,512)
             cfg.default_hooks = dict(
                 early_stopping=dict(
@@ -161,6 +162,22 @@ def main():
               
     else:         
         cfg = Config.fromfile(args.config)
+        if cfg.train_pipline[2]['type'] == 'Resize':
+            cfg.train_pipeline[2]['scale'] = (512,512)
+        cfg.test_pipeline[1]['scale'] = (512,512)
+        cfg.default_hooks = dict(
+            early_stopping=dict(
+                type="EarlyStoppingHook",
+                monitor="coco/bbox_mAP",
+                patience=10,
+                min_delta=0.005),
+            checkpoint=dict(
+                type="CheckpointHook",
+                save_best="coco/bbox_mAP",
+                rule="greater"
+                )
+            )
+        cfg.model.roi_head.bbox_head.num_classes = 10
         cfg.launcher = args.launcher
         if args.cfg_options is not None:
             cfg.merge_from_dict(args.cfg_options)
