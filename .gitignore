@@ -1,0 +1,8 @@
+baseline/
+sample_submission/
+*tar.gz
+*.pth
+*.json
+*.csv
+temp.py
+last_checkpoint
