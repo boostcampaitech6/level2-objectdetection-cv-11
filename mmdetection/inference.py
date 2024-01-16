@@ -27,6 +27,16 @@ def parse_args():
         '--image_path',
         help='test image folder path'
     )
+    parser.add_argument(
+        '--vis',
+        help='set visualization',
+        default=True
+    )
+    parser.add_argument(
+        '--save_pred',
+        help='whether save pred json file',
+        default=True
+    )
     
     args = parser.parse_args()
     return args
@@ -38,11 +48,9 @@ def main():
     cfg.model.roi_head.bbox_head.num_classes = class_num
     cfg.test_pipeline[1]['scale'] = (512,512)
     inferencer = DetInferencer(model=cfg, weights=args.model_path)
-    output = inferencer(inputs=args.image_path, out_dir=os.path.join(args.output_path, args.model_name))
+    output = inferencer(inputs=args.image_path, out_dir=os.path.join(args.output_path, args.model_name), return_vis=args.vis, no_save_vis=not args.vis, no_save_pred=not args.save_pred)
     
-    test_ann_path = '/data/ephemeral/home/data/dataset/test.json'
     coco = COCO(os.path.join(cfg.data_root, cfg.test_dataloader['dataset']['ann_file']))
-    img_ids = coco.getImgIds()
     prediction_strings = []
     file_names = []
     
