@@ -30,12 +30,12 @@ def parse_args():
     parser.add_argument(
         '--vis',
         help='set visualization',
-        default=True
+        default=False
     )
     parser.add_argument(
         '--save_pred',
         help='whether save pred json file',
-        default=True
+        default=False
     )
     
     args = parser.parse_args()
