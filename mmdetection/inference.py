@@ -1,9 +1,13 @@
 from mmdet.apis import DetInferencer
 from mmengine.config import Config
-from pycocotools.coco import COCO
+from mmengine.fileio import (get_file_backend, isdir, join_path,
+                             list_dir_or_file)
 import os
 import argparse
 import pandas as pd
+
+IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif',
+                  '.tiff', '.webp')
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Evaluation')
@@ -42,25 +46,38 @@ def parse_args():
     return args
 
 def main():
+    
     class_num = 10
     args = parse_args()
     cfg = Config.fromfile(args.config)
-    cfg.model.roi_head.bbox_head.num_classes = class_num
+    if 'roi_head' in cfg.model:
+        cfg.model.roi_head.bbox_head.num_classes = class_num
+    else:
+        cfg.model.bbox_head.num_classes = class_num
     cfg.test_pipeline[1]['scale'] = (512,512)
     inferencer = DetInferencer(model=cfg, weights=args.model_path)
-    output = inferencer(inputs=args.image_path, out_dir=os.path.join(args.output_path, args.model_name), return_vis=args.vis, no_save_vis=not args.vis, no_save_pred=not args.save_pred)
+    output = inferencer(inputs=args.image_path, return_datasamples=True)
     
-    coco = COCO(os.path.join(cfg.data_root, cfg.test_dataloader['dataset']['ann_file']))
+    if args.vis:
+        file_list = list_dir_or_file(args.image_path, list_dir=False, suffix=IMG_EXTENSIONS)
+        inputs = [ join_path(args.image_path , filename) for filename in file_list ]
+        inferencer.visualize(inputs = inputs, preds = output['predictions'], img_out_dir = args.output_path)
+    
+    if args.save_pred:
+        for out in output['predictions']:
+            inferencer.pred2dict(out, args.output_path)
+            
     prediction_strings = []
     file_names = []
     
-    for i, out in enumerate(output['predictions']):
-        image_info = coco.loadImgs(coco.getImgIds(imgIds=i))[0]
+    for out in output['predictions']:
+        file_name = os.path.basename(out.img_path)
+        file_name = os.path.join('test', file_name)
         prediction_string = ''
-        for j in range(len(out['labels'])):
-            prediction_string += str(out['labels'][j]) + ' ' + str(out['scores'][j]) + ' ' + str(out['bboxes'][j][0]) + ' ' + str(out['bboxes'][j][1]) + ' ' + str(out['bboxes'][j][2]) + ' ' + str(out['bboxes'][j][3]) + ' '
+        for i in range(len(out.pred_instances.labels)):
+            prediction_string += str(out.pred_instances.labels.tolist()[i]) + ' ' + str(out.pred_instances.scores.tolist()[i]) + ' ' + str(out.pred_instances.bboxes.tolist()[i][0]) + ' ' + str(out.pred_instances.bboxes.tolist()[i][1]) + ' ' + str(out.pred_instances.bboxes.tolist()[i][2]) + ' ' + str(out.pred_instances.bboxes.tolist()[i][3]) + ' '
         prediction_strings.append(prediction_string)
-        file_names.append(image_info['file_name'])
+        file_names.append(file_name)
     
     submission = pd.DataFrame()
     submission['PredictionString'] = prediction_strings
