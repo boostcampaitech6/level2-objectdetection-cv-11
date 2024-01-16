@@ -81,9 +81,7 @@ def main():
     setup_cache_size_limit_of_dynamo()
     
     root='/data/ephemeral/home/data/dataset/'
-    
-   
-    ## kfold 제대로 구현 안됨!! 코드 다시 확인 해야함 
+     
     if args.kfold:
         cfg_list = os.listdir(args.kfold_config)
         cfg_list.sort()
@@ -94,15 +92,9 @@ def main():
                 cfg.train_pipeline[2]['scale'] = (512,512)
             cfg.test_pipeline[1]['scale'] = (512,512)
             cfg.default_hooks = dict(
-                early_stopping=dict(
-                    type="EarlyStoppingHook",
-                    monitor="coco/bbox_mAP",
-                    patience=10,
-                    min_delta=0.005),
                 checkpoint=dict(
                     type="CheckpointHook",
-                    save_best="coco/bbox_mAP",
-                    rule="greater"
+                    interval= args.epoch
                 )
             )
             if 'roi_head' in cfg.model:
