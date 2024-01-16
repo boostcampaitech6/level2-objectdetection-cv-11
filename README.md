@@ -97,10 +97,6 @@ python3 inference.py \
 
 <a href = "mmdetection/configs/boostcamp/test/dcnv2_faster_rcnn_test.py"> DCNv2 faster rcnn (test) </a>
 
-<a href = "mmdetection/configs/boostcamp/dcnv2_mask_rcnn/dcnv2_faster_rcnn.py"> DCNv2 mask rcnn (train) </a>
-
-<a href = "mmdetection/configs/boostcamp/test/dcnv2_mask_rcnn_test.py"> DCNv2 mask rcnn (test) </a>
-
 <a href = "mmdetection/configs/boostcamp/deformable_detr/deformable_detr.py"> Deformable DETR (train) </a>
 
 <a href = "mmdetection/configs/boostcamp/test/deformable_detr_test.py"> Deformable DETR (test) </a>
