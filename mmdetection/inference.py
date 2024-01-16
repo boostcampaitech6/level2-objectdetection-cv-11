@@ -46,9 +46,10 @@ def parse_args():
     return args
 
 def main():
-    
     class_num = 10
     args = parse_args()
+    if not os.path.exists(args.output_path):
+        os.makedirs(args.output_path)
     cfg = Config.fromfile(args.config)
     if 'roi_head' in cfg.model:
         cfg.model.roi_head.bbox_head.num_classes = class_num
@@ -57,16 +58,7 @@ def main():
     cfg.test_pipeline[1]['scale'] = (512,512)
     inferencer = DetInferencer(model=cfg, weights=args.model_path)
     output = inferencer(inputs=args.image_path, return_datasamples=True)
-    
-    if args.vis:
-        file_list = list_dir_or_file(args.image_path, list_dir=False, suffix=IMG_EXTENSIONS)
-        inputs = [ join_path(args.image_path , filename) for filename in file_list ]
-        inferencer.visualize(inputs = inputs, preds = output['predictions'], img_out_dir = args.output_path)
-    
-    if args.save_pred:
-        for out in output['predictions']:
-            inferencer.pred2dict(out, args.output_path)
-            
+                
     prediction_strings = []
     file_names = []
     
@@ -83,6 +75,15 @@ def main():
     submission['PredictionString'] = prediction_strings
     submission['image_id'] = file_names
     submission.to_csv(os.path.join(args.output_path, f'submission_{args.model_name}.csv'), index=None)
+    
+    if args.vis:
+        file_list = list_dir_or_file(args.image_path, list_dir=False, suffix=IMG_EXTENSIONS)
+        inputs = [ join_path(args.image_path , filename) for filename in file_list ]
+        inferencer.visualize(inputs = inputs, preds = output['predictions'], img_out_dir = args.output_path)
+    
+    if args.save_pred:
+        for out in output['predictions']:
+            inferencer.pred2dict(out, args.output_path)
         
 if __name__ == '__main__':
     main()
