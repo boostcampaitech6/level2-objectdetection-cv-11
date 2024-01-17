@@ -99,6 +99,8 @@ def main():
             )
             if 'roi_head' in cfg.model:
                 cfg.model.roi_head.bbox_head.num_classes = 10
+            elif 'bbox_head' in cfg.model:
+                cfg.model.bbox_head.num_classes = 10
             cfg.launcher = args.launcher
             if args.cfg_options is not None:
                 cfg.merge_from_dict(args.cfg_options)
@@ -174,6 +176,8 @@ def main():
             )
         if 'roi_head' in cfg.model:
             cfg.model.roi_head.bbox_head.num_classes = 10
+        elif 'bbox_head' in cfg.model:
+            cfg.model.bbox_head.num_classes = 10
         cfg.launcher = args.launcher
         if args.cfg_options is not None:
             cfg.merge_from_dict(args.cfg_options)

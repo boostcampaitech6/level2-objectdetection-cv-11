@@ -15,6 +15,8 @@ from .split_batch import split_batch
 from .typing_utils import (ConfigType, InstanceList, MultiConfig,
                            OptConfigType, OptInstanceList, OptMultiConfig,
                            OptPixelList, PixelList, RangeType)
+from .query_denoising import build_dn_generator
+from .transformer import (DinoTransformer, DinoTransformerDecoder)
 
 __all__ = [
     'collect_env', 'find_latest_checkpoint', 'update_data_root',
@@ -24,5 +26,6 @@ __all__ = [
     'sync_random_seed', 'ConfigType', 'InstanceList', 'MultiConfig',
     'OptConfigType', 'OptInstanceList', 'OptMultiConfig', 'OptPixelList',
     'PixelList', 'RangeType', 'get_test_pipeline_cfg',
-    'setup_cache_size_limit_of_dynamo', 'imshow_mot_errors'
+    'setup_cache_size_limit_of_dynamo', 'imshow_mot_errors',
+    'build_dn_generator', 'DinoTransformer', 'DinoTransformerDecoder'
 ]
