@@ -969,7 +969,7 @@ def build_MLP(input_dim, hidden_dim, output_dim, num_layers):
     return nn.Sequential(*layers)
 
 
-@MODELS.register_module()
+@MODELS.register_module(force=True)
 class DinoTransformerDecoder(DeformableDetrTransformerDecoder):
 
     def __init__(self, *args, **kwargs):
@@ -1296,7 +1296,7 @@ class CoDinoTransformer(CoDeformableDetrTransformer):
         return inter_states, inter_references_out
 
 
-@MODELS.register_module()
+@MODELS.register_module(force=True)
 class DetrTransformerEncoder(TransformerLayerSequence):
     """TransformerEncoder of DETR.
 
@@ -1330,7 +1330,7 @@ class DetrTransformerEncoder(TransformerLayerSequence):
                 self.layers[i] = checkpoint_wrapper(self.layers[i])
 
 
-@MODELS.register_module()
+@MODELS.register_module(force=True)
 class DetrTransformerDecoderLayer(BaseTransformerLayer):
     """Implements decoder layer in DETR transformer.
 

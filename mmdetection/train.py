@@ -88,7 +88,7 @@ def main():
         for i, cfg_path in enumerate(cfg_list):
             cfg = Config.fromfile(os.path.join(args.kfold_config, cfg_path))
             cfg.train_cfg = dict(type='EpochBasedTrainLoop', max_epochs= args.epoch * (i+1), val_interval=1)
-            if cfg.train_pipeline[2]['type'] == 'Resize':
+            if len(cfg.train_pipeline) > 2 and cfg.train_pipeline[2]['type'] == 'Resize':
                 cfg.train_pipeline[2]['scale'] = (512,512)
             cfg.test_pipeline[1]['scale'] = (512,512)
             cfg.default_hooks = dict(
@@ -97,10 +97,6 @@ def main():
                     interval= args.epoch
                 )
             )
-            if 'roi_head' in cfg.model:
-                cfg.model.roi_head.bbox_head.num_classes = 10
-            elif 'bbox_head' in cfg.model:
-                cfg.model.bbox_head.num_classes = 10
             cfg.launcher = args.launcher
             if args.cfg_options is not None:
                 cfg.merge_from_dict(args.cfg_options)
@@ -158,7 +154,7 @@ def main():
               
     else:         
         cfg = Config.fromfile(args.config)
-        if cfg.train_pipeline[2]['type'] == 'Resize':
+        if len(cfg.train_pipeline) > 2 and cfg.train_pipeline[2]['type'] == 'Resize':
             cfg.train_pipeline[2]['scale'] = (512,512)
         cfg.test_pipeline[1]['scale'] = (512,512)
         cfg.visualizer.vis_backends = [dict(type='TensorboardVisBackend')] # tensorboard용
@@ -174,10 +170,6 @@ def main():
                 rule="greater"
                 )
             )
-        if 'roi_head' in cfg.model:
-            cfg.model.roi_head.bbox_head.num_classes = 10
-        elif 'bbox_head' in cfg.model:
-            cfg.model.bbox_head.num_classes = 10
         cfg.launcher = args.launcher
         if args.cfg_options is not None:
             cfg.merge_from_dict(args.cfg_options)

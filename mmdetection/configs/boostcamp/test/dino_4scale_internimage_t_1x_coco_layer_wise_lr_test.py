@@ -292,97 +292,26 @@ model = dict(
         # e.g., nms=dict(type='soft_nms', iou_threshold=0.5, min_score=0.05)
     ])
 
-img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-# train_pipeline, NOTE the img_scale and the Pad's size_divisor is different
-# from the default setting in mmdet.
-load_pipeline = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
-    dict(
-        type='RandomResize',
-        scale=image_size,
-        ratio_range=(0.1, 2.0),
-        keep_ratio=True),
-    dict(
-        type='RandomCrop',
-        crop_type='absolute_range',
-        crop_size=image_size,
-        recompute_bbox=True,
-        allow_negative_crop=True),
-    dict(type='FilterAnnotations', min_gt_bbox_wh=(1e-2, 1e-2)),
-    dict(type='RandomFlip', prob=0.5),        
-    # dict(
-    #     type='AutoAugment',
-    #     policies=[
-    #         [
-    #             dict(
-    #                 type='RandomChoiceResize',
-    #                 scales=[(480, 1333), (512, 1333), (544, 1333),
-    #                            (576, 1333), (608, 1333), (640, 1333),
-    #                            (672, 1333), (704, 1333), (736, 1333),
-    #                            (768, 1333), (800, 1333)],
-    #                 keep_ratio=True)
-    #         ],
-    #         [
-    #             dict(
-    #                 type='RandomChoiceResize',
-    #                 scales=[(400, 4200), (500, 4200), (600, 4200)],
-    #                 keep_ratio=True),
-    #             dict(
-    #                 type='RandomCrop',
-    #                 crop_type='absolute_range',
-    #                 crop_size=(384, 600),
-    #                 allow_negative_crop=False),
-    #             dict(
-    #                 type='RandomChoiceResize',
-    #                 scales=[(480, 1333), (512, 1333), (544, 1333),
-    #                            (576, 1333), (608, 1333), (640, 1333),
-    #                            (672, 1333), (704, 1333), (736, 1333),
-    #                            (768, 1333), (800, 1333)],
-    #                 keep_ratio=True)
-    #         ]
-    #     ]),
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size=image_size, pad_val=dict(img=(114, 114, 114)))
-]
 
-train_pipeline = [
-    dict(type='CopyPaste', max_num_pasted=100),
-    dict(type='PackDetInputs')
-]
-
-train_dataloader = dict(
-    sampler=dict(type='DefaultSampler', shuffle=True),
-    dataset=dict(
-        pipeline=train_pipeline,
-        dataset=dict(
-            data_root=data_root,
-            metainfo=metainfo,
-            ann_file='train_333_fold_1_polygon.json',
-            data_prefix=dict(img=''),
-            filter_cfg=dict(filter_empty_gt=False), pipeline=load_pipeline))
-)
 # follow ViTDet
 test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='Resize', scale=image_size, keep_ratio=True),  # diff
     dict(type='Pad', size=image_size, pad_val=dict(img=(114, 114, 114))),
-    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='LoadAnnotations', with_bbox=False, with_mask=False),
     dict(
         type='PackDetInputs',
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
                    'scale_factor'))
 ]
 
-val_dataloader = dict(
+test_dataloader = dict(
     dataset=dict(
         data_root=data_root,
         metainfo=metainfo,  
-        ann_file='val_333_fold_1_polygon.json',
+        ann_file='test.json',
         data_prefix=dict(img=''),                
         pipeline=test_pipeline))
-test_dataloader = val_dataloader
 
 optim_wrapper = dict(
     _delete_=True,
@@ -391,20 +320,15 @@ optim_wrapper = dict(
     clip_grad=dict(max_norm=0.1, norm_type=2),
     paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.1)}))
 
-val_evaluator = dict(
+test_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + 'val_333_fold_1_polygon.json',
+    ann_file=data_root + 'test.json',
     metric='bbox',
     format_only=False,
     classwise=True)
-test_evaluator = val_evaluator
+
 
 max_epochs = 12
-train_cfg = dict(
-    _delete_=True,
-    type='EpochBasedTrainLoop',
-    max_epochs=max_epochs,
-    val_interval=1)
 
 param_scheduler = [
     dict(

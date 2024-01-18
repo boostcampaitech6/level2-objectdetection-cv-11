@@ -13,7 +13,7 @@ import json
 from mmdet.registry import OPTIM_WRAPPER_CONSTRUCTORS
 from mmengine.optim import DefaultOptimWrapperConstructor
 from mmengine.dist import get_dist_info
-from mmdet.utils import get_root_logger
+from mmengine.logging import MMLogger
 
 
 def get_num_layer_for_swin(var_name, num_max_layer, depths):
@@ -66,7 +66,7 @@ class CustomLayerDecayOptimizerConstructor(DefaultOptimWrapperConstructor):
                 control conv_offset layer's learning rate. Defaults to None.
         """
         parameter_groups = {}
-        logger = get_root_logger()
+        logger = MMLogger.get_current_instance()
         logger.info(self.paramwise_cfg)
         backbone_small_lr = self.paramwise_cfg.get('backbone_small_lr', False)
         dino_head = self.paramwise_cfg.get('dino_head', False)

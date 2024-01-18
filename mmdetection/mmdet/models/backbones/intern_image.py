@@ -11,12 +11,13 @@ import torch.utils.checkpoint as checkpoint
 from mmengine.model.weight_init import trunc_normal_
 from mmcv.cnn.bricks import DropPath
 from mmengine.infer.infer import _load_checkpoint
-from mmcv.cnn import constant_init, trunc_normal_init
-from mmdet.utils import get_root_logger
+from mmengine.model.weight_init import (constant_init, trunc_normal_,
+                                        trunc_normal_init)
+from mmengine.logging import MMLogger
 from mmdet.registry import MODELS
 import torch.nn.functional as F
 
-from ops_dcnv3 import modules as opsm
+from mmdet.ops_dcnv3 import modules as opsm
 
 
 class to_channels_first(nn.Module):
@@ -584,7 +585,7 @@ class InternImage(nn.Module):
         self.init_cfg = init_cfg
         self.out_indices = out_indices
         self.level2_post_norm_block_ids = level2_post_norm_block_ids
-        logger = get_root_logger()
+        logger = MMLogger.get_current_instance()
         logger.info(f'using core type: {core_op}')
         logger.info(f'using activation layer: {act_layer}')
         logger.info(f'using main norm layer: {norm_layer}')
@@ -638,7 +639,7 @@ class InternImage(nn.Module):
         self.apply(self._init_deform_weights)
 
     def init_weights(self):
-        logger = get_root_logger()
+        logger = MMLogger.get_current_instance()
         if self.init_cfg is None:
             logger.warn(f'No pre-trained weights for '
                         f'{self.__class__.__name__}, '

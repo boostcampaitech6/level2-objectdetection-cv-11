@@ -32,7 +32,7 @@ def get_extensions():
     extra_compile_args = {"cxx": []}
     define_macros = []
 
-    if torch.cuda.is_available() and CUDA_HOME is not None:
+    if torch.cuda.is_available() or os.getenv('FORCE_CUDA', '0') == '1':
         extension = CUDAExtension
         sources += source_cuda
         define_macros += [("WITH_CUDA", None)]
@@ -43,7 +43,7 @@ def get_extensions():
             # "-D__CUDA_NO_HALF2_OPERATORS__",
         ]
     else:
-        raise NotImplementedError('Cuda is not availabel')
+        raise NotImplementedError('Cuda is not available')
 
     sources = [os.path.join(extensions_dir, s) for s in sources]
     include_dirs = [extensions_dir]
@@ -58,18 +58,20 @@ def get_extensions():
     ]
     return ext_modules
 
-
-setup(
-    name="DCNv3",
-    version="1.0",
-    author="InternImage",
-    url="https://github.com/OpenGVLab/InternImage",
-    description=
-    "PyTorch Wrapper for CUDA Functions of DCNv3",
-    packages=find_packages(exclude=(
-        "configs",
-        "tests",
-    )),
-    ext_modules=get_extensions(),
-    cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
-)
+if __name__ == '__main__':
+    setup(
+        name="DCNv3",
+        version="1.0",
+        author="InternImage",
+        url="https://github.com/OpenGVLab/InternImage",
+        description=
+        "PyTorch Wrapper for CUDA Functions of DCNv3",
+        packages=find_packages(exclude=(
+            "configs",
+            "tests",
+        )),
+        include_package_data=True,
+        ext_modules=[],
+        cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
+        zip_safe=False
+    )

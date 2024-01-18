@@ -61,6 +61,7 @@ class DeformableDETR(DetectionTransformer):
             # from encode feature map when `as_two_stage` is `True`.
             # And all the prediction layers should share parameters
             # when `with_box_refine` is `True`.
+            print(decoder)
             bbox_head['share_pred_layer'] = not with_box_refine
             bbox_head['num_pred_layer'] = (decoder['num_layers'] + 1) \
                 if self.as_two_stage else decoder['num_layers']
